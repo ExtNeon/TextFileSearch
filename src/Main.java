@@ -6,26 +6,30 @@ import java.text.DecimalFormat;
  */
 public class Main {
     public static void main(String[] args) throws InterruptedException {
-        DirScanner scanner = new DirScanner(getEnteredString("Введите стартовый каталог: "));
+        DirScanner dirScanner = new DirScanner(getEnteredString("Введите стартовый каталог: "));
         String textToFind = getEnteredString("Введите строку, которую необходимо найти: ");
-        scanner.start();
         System.out.println("Выполняется поиск файлов...");
         System.out.print("0 файлов найдено");
-        while (scanner.isAlive()) {
-            System.out.print("\r"+scanner.getFilesList().size() + " файлов найдено");
-            Thread.sleep(100);
+        dirScanner.start();
+        char spc_waitingAnimationSteps[] = {'|','/','-','\\'};
+        while (dirScanner.isAlive()) {
+            for (int i = 0; i < 4; i++) { //Чисто для красоты
+                System.out.print("\r" + dirScanner.getFilesList().size() + " файлов найдено, " + dirScanner.getCountOfPassedFiles() + " файлов пропущено " + spc_waitingAnimationSteps[i]);
+                Thread.sleep(300);
+            }
         }
+        System.out.println("\rПоиск завершён. Найдено " + dirScanner.getFilesList().size() + " файлов. Пропущено по техническим причинам: " + dirScanner.getCountOfPassedFiles() + " файлов.");
         ArrayList<String> textFilesList = new ArrayList<>();
-        for (String currentFile : scanner.getFilesList()) {
+        for (String currentFile : dirScanner.getFilesList()) {
             try {
                 if (currentFile.substring(currentFile.lastIndexOf('.') + 1).equals("txt")) {
                     textFilesList.add(currentFile);
                 }
             } catch (NullPointerException e) {
-                System.err.println("Ошибка в процессе поиска: запись равна null. Данная запись была пропущена.");
+               // System.err.println("Ошибка в процессе поиска: запись равна null. Данная запись была пропущена.");
             }
         }
-        System.out.println("\nВ указанной дирректории и всех поддиректориях найдено " + textFilesList.size() + " текстовых файлов");
+        System.out.println("В указанной дирректории и всех поддиректориях найдено " + textFilesList.size() + " текстовых файлов");
         if (textFilesList.size() > 0) {
             ArrayList<ThreadedFileTextSearcher> searchers = new ArrayList<>(textFilesList.size());
             ArrayList<String> foundFilesList = new ArrayList<>();
@@ -43,7 +47,6 @@ public class Main {
                         if (searchers.get(i).isFounded()) {
                             foundFilesList.add(searchers.get(i).getPathToFile());
                         }
-
                         searchersDone++;
                         System.out.print("\r" + (searchers.get(i).isFounded() ? "Искомая строка найдена в файле \""+searchers.get(i).getPathToFile()+"\"\n" : "") + getPercentLine((((double) searchersDone / countOfSearchers) * 100), 60) + " done");
                         searchers.remove(i);
@@ -51,7 +54,7 @@ public class Main {
                     }
                 }
             }
-            System.out.println("\nРезультат поиска: \nВсего файлов в дирректориях: " +  scanner.getFilesList().size() + ", из них текстовых файлов: " + textFilesList.size()
+            System.out.println("\nРезультат поиска: \nВсего файлов в дирректориях: " +  dirScanner.getFilesList().size() + ", из них текстовых файлов: " + textFilesList.size()
                     + "\nИскомый текст найден в " + foundFilesList.size() + " файлах.");
         }
     }
