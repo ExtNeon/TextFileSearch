@@ -5,12 +5,6 @@ import java.text.DecimalFormat;
  * Created by Кирилл on 24.03.2018.
  */
 public class Main {
-    /**
-     * Необходимые классы:э
-     * 1) Класс, ищущий в файлах. В конструкторе передаётся имя файла, строка, которую нужно найти.
-     * 2)
-     * 3) Класс, обрабатывающий
-     */
     public static void main(String[] args) throws InterruptedException {
         DirScanner scanner = new DirScanner(getEnteredString("Введите стартовый каталог: "));
         String textToFind = getEnteredString("Введите строку, которую необходимо найти: ");
